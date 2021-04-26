@@ -1,0 +1,9 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: yes
+    tmfifo_net0:
+      addresses: [192.168.100.1/24]
+      dhcp4: no
