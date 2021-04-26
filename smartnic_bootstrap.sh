@@ -1,10 +1,10 @@
 #!/bin/bash
 sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " >> /etc/motd
-sudo cat sudo cp /local/repository/source/bashrc_template >> /root/.bashrc
+cat /local/repository/source/bashrc_template |sudo tee -a /root/.bashrc
 
 sudo echo -e "\nInstalling MLNX driver..." > /opt/install_log
 #sudo echo -e "\nCopy to /opt..." >> /opt/install_log
-sudo cd /opt
+cd /opt
 sudo echo -e "\nDownliading driver to/opt..." >> /opt/install_log
 sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz >> /opt/install_log
 #sudo cp /local/repository/source/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz /opt
@@ -12,7 +12,7 @@ sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFE
 sudo echo -e "\nUncompress..." >> /opt/install_log
 sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz
 
-sudo cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
+cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
 sudo echo -e "\nInstall driver..." >> /opt/install_log
 sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force
 
