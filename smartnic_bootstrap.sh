@@ -39,5 +39,14 @@ sudo echo -e "\nEnable IP forwarding for the SmartNIC" |sudo tee -a /opt/install
 sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
 
+
+sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
+DEPS="tightvncserver lightdm xfce4 xfwm4"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DEPS
+
+sudo echo -e "\nSet permissions for /mydata" | sudo tee -a /opt/install_log
+sudo chmod -R 777 /mydata
+
+
 sudo echo -e "\n\n ============ DONE =========== " |sudo tee -a /opt/install_log
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee -a /etc/motd
