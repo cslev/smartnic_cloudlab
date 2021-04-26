@@ -68,6 +68,7 @@ link_2.addInterface(iface6)
 
 #### ------------------------- CONFIGURE NODES ---------------------------------
 node_bf1.addService(pg.Execute(shell="bash", command="/local/repository/smartnic_bootstap.sh"))
+node_bf2.addService(pg.Execute(shell="bash", command="/local/repository/smartnic_bootstap.sh"))
 
 # Print the generated rspec
 pc.printRequestRSpec(request)
