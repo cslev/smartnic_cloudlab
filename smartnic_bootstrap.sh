@@ -41,7 +41,7 @@ sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
 
 
 sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
-DEPS="tightvncserver lightdm lxde xfonts-base"
+DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DEPS
 
 sudo echo -e "\nSet permissions for /mydata" | sudo tee -a /opt/install_log
