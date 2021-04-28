@@ -41,11 +41,19 @@ sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
 
 
 sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
-DEPS="tightvncserver lightdm lxde"
+DEPS="tightvncserver lightdm lxde xfonts-base"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DEPS
 
 sudo echo -e "\nSet permissions for /mydata" | sudo tee -a /opt/install_log
 sudo chmod -R 777 /mydata
+
+sudo mst start
+for i in $(sudo mst status -v|grep BlueField|awk '{print $2}')
+do
+  echo "dev: ${i}"
+  mlxconfig -d $i q | grep -i internal_cpu
+done
+echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_CPU_MODEL=1"
 
 
 sudo echo -e "\n\n ============ DONE =========== " |sudo tee -a /opt/install_log
