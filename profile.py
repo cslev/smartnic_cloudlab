@@ -71,4 +71,4 @@ node_bf1.addService(pg.Execute(shell="bash", command="/local/repository/smartnic
 node_bf2.addService(pg.Execute(shell="bash", command="/local/repository/smartnic_bootstap.sh"))
 
 # Print the generated rspec
-pc.printRequestRSpec(request)
+pc.printRequestRSpec()
