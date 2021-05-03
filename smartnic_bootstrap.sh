@@ -1,5 +1,7 @@
 #!/bin/bash
-sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " >> /etc/motd
+sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee -a /etc/motd
+sudo date | sudo tee -a /etc/motd
+
 cat /local/repository/source/bashrc_template |sudo tee -a /root/.bashrc
 
 sudo echo -e "\nInstalling MLNX driver..." |sudo tee /opt/install_log
@@ -15,7 +17,7 @@ sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz
 cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
 sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
 sudo ./mlnxofedinstall --auto-add-kernel-support --ovs-dpdk --without-fw-update --force
-
+cd ..
 
 sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
 sudo /etc/init.d/openibd restart |sudo tee -a /opt/install_log
@@ -44,8 +46,34 @@ sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_lo
 DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DEPS
 
+sudo echo -e "\nInstalling DOCA SDKMANAGER dependencies..." | sudo tee -a /opt/install_log
+DOCA_SDK_MAN_DEP="gconf-service gconf-service-backend gconf2-common libcanberra-gtk-module libcanberra-gtk0 libgconf-2-4"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DOCA_SDK_MAN_DEP
+
+#setting up extra storage
 sudo echo -e "\nSet permissions for /mydata" | sudo tee -a /opt/install_log
 sudo chmod -R 777 /mydata
+
+sudo echo -e "\nInstalling DOCKER and its dependencies..." | sudo tee -a /opt/install_log
+#install dependencies for docker
+DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DOCKER_DEP
+#install certificate for docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+#install docker
+DOCKER="docker-ce docker-ce-cli containerd.io"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DOCKER
+
+sudo echo -e "\nStopping docker daemon and update location for downloading sources..."  | sudo tee -a /opt/install_log
+sudo /etc/init.d/docker stop
+#define new location in docker daemon.json
+echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" > /etc/docker/daemon.json
+#rsync old docker files to new locations
+rsync -aP /var/lib/docker/ /mydata/docker
+#restart docker
+/etc/init.d/docker restart
 
 sudo mst start
 for i in $(sudo mst status -v|grep BlueField|awk '{print $2}')
@@ -73,3 +101,5 @@ echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_C
 
 sudo echo -e "\n\n ============ DONE =========== " |sudo tee -a /opt/install_log
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee -a /etc/motd
+sudo date | sudo tee -a /etc/motd
+
