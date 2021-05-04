@@ -25,7 +25,7 @@ hcolor=$(echo -e ${colors[${rnd_color}]})
 
 case $TERM in
         xterm*|rxvt|Eterm|eterm|cygwin)
-PS1='\[\033[1m\]\[${hcolor}\][SmartNIC_HOST]\[\033[0;1m\]\[\033[38;5;78m\]${debian_chroot:+($debian_chroot)} \[\033[01;31m\]\u \[\033[38;5;78m\]\w\$\[\033[00m\] '
+PS1='\[\033[1m\]\[${hcolor}\][SmartNIC_HOST_${HOSTNAME}]\[\033[0;1m\]\[\033[38;5;78m\]${debian_chroot:+($debian_chroot)} \[\033[01;31m\]\u \[\033[38;5;78m\]\w\$\[\033[00m\] '
 
         ;;
 esac

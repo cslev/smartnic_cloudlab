@@ -7,16 +7,16 @@ cat /local/repository/source/bashrc_template |sudo tee -a /root/.bashrc
 sudo echo -e "\nInstalling MLNX driver..." |sudo tee /opt/install_log
 #sudo echo -e "\nCopy to /opt..." >> /opt/install_log
 cd /opt
-sudo echo -e "\nDownliading driver to/opt..." |sudo tee -a /opt/install_log
-sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz >> /opt/install_log
+sudo echo -e "\nDownliading driver to /opt..." |sudo tee -a /opt/install_log
+sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz |sudo tee -a /opt/install_log
 #sudo cp /local/repository/source/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz /opt
 #sudo cd /opt
 sudo echo -e "\nUncompress..." |sudo tee -a /opt/install_log
-sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz
+sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz | sudo tee -a /opt/install_log
 
-cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
+cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64 |sudo tee -a /opt/install_log
 sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
-sudo ./mlnxofedinstall --auto-add-kernel-support --ovs-dpdk --without-fw-update --force
+sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 cd ..
 
 sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
@@ -66,10 +66,14 @@ sudo apt-get update
 DOCKER="docker-ce docker-ce-cli containerd.io"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DOCKER
 
+#dpdk dependencies
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build"
+DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DPDK_DEP
+
 sudo echo -e "\nStopping docker daemon and update location for downloading sources..."  | sudo tee -a /opt/install_log
 sudo /etc/init.d/docker stop
 #define new location in docker daemon.json
-echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" > /etc/docker/daemon.json
+sudo echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" |sudo tee /etc/docker/daemon.json
 #rsync old docker files to new locations
 rsync -aP /var/lib/docker/ /mydata/docker
 #restart docker
