@@ -17,7 +17,7 @@ pc = portal.Context()
 
 # Create a Request object to start building the RSpec.
 request = pc.makeRequestRSpec()
-rspec = pg.Request()
+#rspec = pg.Request()
 
 
 #### ---------------------------- TOPOLOGY -------------------------------------
@@ -71,8 +71,8 @@ link_2.addInterface(iface6)
 node_bf1.addService(pg.Execute(shell="bash", command="/local/repository/smartnic_bootstrap.sh"))
 node_bf2.addService(pg.Execute(shell="bash", command="/local/repository/smartnic_bootstrap.sh"))
 
-rspec.addResource(node_bf1)
-rspec.addResource(node_bf2)
+#rspec.addResource(node_bf1)
+#rspec.addResource(node_bf2)
 
 # Print the generated rspec
-pc.printRequestRSpec(rspec)
+pc.printRequestRSpec(request)
