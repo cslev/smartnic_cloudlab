@@ -29,7 +29,7 @@ DOCKER="docker-ce docker-ce-cli containerd.io"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DOCKER
 
 #dpdk dependencies
-DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build"
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DPDK_DEP
 
 sudo echo -e "\nStopping docker daemon and update location for downloading sources..."  | sudo tee -a /opt/install_log
@@ -109,6 +109,10 @@ sudo tar -xJvf pktgen-dpdk-pktgen-21.02.0.tar.xz | sudo tee -a /opt/install_log
 cd pktgen-dpdk-pktgen-21.02.0/
 sudo make | sudo tee -a /opt/install_log
 sudo ldconfig
+
+sudo echo -e "\nEnabling hugepages..." | sudo tee -a /opt/install_log
+sudo echo 1024 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 
 # FORBIDDEN - HAVE TO BE LOGGED IN :(
 # cd ..
