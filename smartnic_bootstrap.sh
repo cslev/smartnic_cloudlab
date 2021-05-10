@@ -4,8 +4,8 @@ sudo date | sudo tee -a /etc/motd
 
 cat /local/repository/source/bashrc_template |sudo tee  /root/.bashrc
 
-sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
-DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev"
+sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee /opt/install_log
+DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev firefox"
 DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $DEPS
 
 sudo echo -e "\nInstalling DOCA SDKMANAGER dependencies..." | sudo tee -a /opt/install_log
@@ -42,17 +42,17 @@ rsync -aP /var/lib/docker/ /mydata/docker
 /etc/init.d/docker restart
 
 
-sudo echo -e "\nInstalling MLNX driver..." |sudo tee /opt/install_log
+sudo echo -e "\nInstalling MLNX driver..." |sudo tee -a /opt/install_log
 #sudo echo -e "\nCopy to /opt..." >> /opt/install_log
 cd /opt
-sudo echo -e "\nDownliading driver to /opt..." |sudo tee -a /opt/install_log
-sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz |sudo tee -a /opt/install_log
+sudo echo -e "\nDownloading driver to /opt..." |sudo tee -a /opt/install_log
+sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz 
 #sudo cp /local/repository/source/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz /opt
 #sudo cd /opt
 sudo echo -e "\nUncompress..." |sudo tee -a /opt/install_log
 sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz | sudo tee -a /opt/install_log
 
-cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64 |sudo tee -a /opt/install_log
+cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
 sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
 sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 cd ..
@@ -89,6 +89,26 @@ do
 done
 echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_CPU_MODEL=1"
 
+
+sudo echo -e "\nInstalling DPDK..." | sudo tee -a /opt/install_log
+cd /opt
+sudo wget https://fast.dpdk.org/rel/dpdk-20.11.1.tar.xz 
+sudo tar -xJvf dpdk-20.11.1.tar.xz |sudo tee -a /opt/install_log
+cd dpdk-stable-20.11.1
+export RTE_SDK=/opt/dpdk-stable-20.11.1
+export RTE_TARGET=x86_64-native-linuxapp-gcc
+#export RTE_TARGET=arm64-armv8-linuxapp-gcc <-- this would be for the Bluefield, but now we are on the host
+sudo meson -Dexamples=all build |sudo tee -a /opt/install_log
+sudo ninja -C build | sudo tee -a /opt/install_log
+sudo ninja -C build install | sudo tee -a /opt/install_log
+
+sudo echo -e "\nInstalling pktgen..." | sudo tee -a /opt/install_log
+cd /opt
+sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.02.0.tar.xz 
+sudo tar -xJvf pktgen-dpdk-pktgen-21.02.0.tar.xz | sudo tee -a /opt/install_log
+cd pktgen-dpdk-pktgen-21.02.0/
+sudo make | sudo tee -a /opt/install_log
+sudo ldconfig
 
 # FORBIDDEN - HAVE TO BE LOGGED IN :(
 # cd ..
