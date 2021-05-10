@@ -1,5 +1,6 @@
 #!/bin/bash
-sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee -a /etc/motd
+
+sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
 
 cat /local/repository/source/bashrc_template |sudo tee  /root/.bashrc
