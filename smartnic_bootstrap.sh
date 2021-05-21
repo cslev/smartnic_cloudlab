@@ -53,7 +53,7 @@ sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFE
 sudo echo -e "\nUncompress..." |sudo tee -a /opt/install_log
 sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz | sudo tee -a /opt/install_log
 
-cd MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64
+cd /opt/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64/
 sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
 sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 cd ..
@@ -86,7 +86,7 @@ sudo mst start
 for i in $(sudo mst status -v|grep BlueField|awk '{print $2}')
 do
   echo "dev: ${i}"
-  mlxconfig -d $i q | grep -i internal_cpu
+  sudo mlxconfig -d $i q | grep -i internal_cpu
 done
 echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_CPU_MODEL=1"
 
