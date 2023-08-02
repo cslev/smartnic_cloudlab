@@ -60,6 +60,7 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade
 # cd /opt/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64/
 # sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
 # sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
+
 # cd ..
 
 # sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
