@@ -47,7 +47,17 @@ sudo  echo -e "\nUpdating system components..." | sudo tee -a /opt/install_log
 DEBIAN_FRONTEND=noninteractive sudo apt-get update
 DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade
 
-# sudo echo -e "\nInstalling MLNX driver..." |sudo tee -a /opt/install_log
+
+sudo echo -e "\nInstalling Bluefield2 drivers and tools..." |sudo tee -a /opt/install_log
+sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+sudo dpkg -i doca-host-repo-ubuntu2004_2.0.2–0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+DEBIAN_FRONTEND=noninteractive sudo apt-get update
+DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools
+
+
+#########################
+##### OLD STUFF HERE ####
+#########################
 # #sudo echo -e "\nCopy to /opt..." >> /opt/install_log
 # cd /opt
 # sudo echo -e "\nDownloading driver to /opt..." |sudo tee -a /opt/install_log
@@ -62,30 +72,39 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade
 # sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 
 # cd ..
+#########################
+#########################
+#########################
 
-# sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
-# sudo /etc/init.d/openibd restart |sudo tee -a /opt/install_log
+sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
+sudo /etc/init.d/openibd restart |sudo tee -a /opt/install_log
 
-# sudo echo -e "\nEnable rshim" |sudo tee -a /opt/install_log
-# sudo systemctl enable rshim
-# sudo systemctl start rshim
-# sudo systemctl status rshim |sudo tee -a /opt/install_log
+sudo echo -e "\nEnable rshim" |sudo tee -a /opt/install_log
+sudo systemctl enable rshim
+sudo systemctl start rshim
+sudo systemctl status rshim |sudo tee -a /opt/install_log
 
 
-# sudo echo "DISPLAY_LEVEL 1" |sudo tee /dev/rshim0/misc
+sudo echo "DISPLAY_LEVEL 1" |sudo tee /dev/rshim0/misc
 
-# sudo echo -e "\nUpdate netplan to assign IP to tmfif_net0..." |sudo tee -a /opt/install_log
-# sudo cp /local/repository/source/01-netcfg.yaml /etc/netplan/
-# sudo systemctl restart systemd-networkd
-# sudo netplan apply
+sudo echo -e "\nUpdate netplan to assign IP to tmfif_net0..." |sudo tee -a /opt/install_log
+sudo cp /local/repository/source/01-netcfg.yaml /etc/netplan/
+sudo systemctl restart systemd-networkd
+sudo netplan apply
 
-# sudo ifconfig tmfifo_net0 |sudo tee -a /opt/install_log
+sudo ifconfig tmfifo_net0 |sudo tee -a /opt/install_log
 
-# sudo echo -e "\nEnable IP forwarding for the SmartNIC" |sudo tee -a /opt/install_log
-# sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
-# sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
-# sudo iptables -A FORWARD -o eno1 -j ACCEPT
-# sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
+sudo echo -e "\nEnable IP forwarding and NAT for the SmartNIC" |sudo tee -a /opt/install_log
+sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
+sudo iptables -A FORWARD -o eno1 -j ACCEPT
+sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
+
+
+sudo echo -e "\nDownloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield" | sudo tee -a /opt/install_log
+cd /opt/
+sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+
 
 # sudo mst start
 # for i in $(sudo mst status -v|grep BlueField|awk '{print $2}')
@@ -116,9 +135,9 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade
 # sudo make | sudo tee -a /opt/install_log
 # sudo ldconfig
 
-# sudo echo -e "\nEnabling hugepages..." | sudo tee -a /opt/install_log
-# sudo echo 1024 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-# mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
+sudo echo -e "\nEnabling hugepages..." | sudo tee -a /opt/install_log
+sudo echo 1024 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
 # # cd ..
