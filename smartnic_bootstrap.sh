@@ -3,11 +3,16 @@
 sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
 
-cat /local/repository/source/bashrc_template |sudo tee  /root/.bashrc
+cat /local/repository/source/bashrc_template | sudo tee /root/.bashrc
 
-sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee /opt/install_log
-DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev firefox"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DEPS
+sudo echo -e "\nUpdate package repository" | sudo tee /opt/install_log
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
+
+## don't need these things for now
+# sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
+# DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev firefox "
+# DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DEPS
+
 
 sudo echo -e "\nInstalling DOCA SDKMANAGER dependencies..." | sudo tee -a /opt/install_log
 DOCA_SDK_MAN_DEP="gconf-service gconf-service-backend gconf2-common libcanberra-gtk-module libcanberra-gtk0 libgconf-2-4"
@@ -24,19 +29,19 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 #install certificate for docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
+sudo apt-get update -y
 #install docker
 DOCKER="docker-ce docker-ce-cli containerd.io"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER
 
-#dpdk dependencies
-DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev"
+#dpdk and pktgen dependencies
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP
 
 sudo echo -e "\nStopping docker daemon and update location for downloading sources..."  | sudo tee -a /opt/install_log
 sudo /etc/init.d/docker stop
 #define new location in docker daemon.json
-sudo echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" |sudo tee /etc/docker/daemon.json
+sudo echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" | sudo tee /etc/docker/daemon.json
 #rsync old docker files to new locations
 rsync -aP /var/lib/docker/ /mydata/docker
 #restart docker
@@ -44,14 +49,14 @@ rsync -aP /var/lib/docker/ /mydata/docker
 
 
 sudo  echo -e "\nUpdating system components..." | sudo tee -a /opt/install_log
-DEBIAN_FRONTEND=noninteractive sudo apt-get update
-DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
+DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
 
 
-sudo echo -e "\nInstalling Bluefield2 drivers and tools..." |sudo tee -a /opt/install_log
+sudo echo -e "\nInstalling Bluefield2 drivers and tools..." | sudo tee -a /opt/install_log
 sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 sudo dpkg -i doca-host-repo-ubuntu2004_2.0.2–0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
-DEBIAN_FRONTEND=noninteractive sudo apt-get update
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools
 
 
@@ -76,25 +81,25 @@ DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-
 #########################
 #########################
 
-sudo echo -e "\nEnable openibd" |sudo tee -a /opt/install_log
-sudo /etc/init.d/openibd restart |sudo tee -a /opt/install_log
+sudo echo -e "\nEnable openibd" | sudo tee -a /opt/install_log
+sudo /etc/init.d/openibd restart | sudo tee -a /opt/install_log
 
-sudo echo -e "\nEnable rshim" |sudo tee -a /opt/install_log
+sudo echo -e "\nEnable rshim" | sudo tee -a /opt/install_log
 sudo systemctl enable rshim
 sudo systemctl start rshim
-sudo systemctl status rshim |sudo tee -a /opt/install_log
+sudo systemctl status rshim | sudo tee -a /opt/install_log
 
 
-sudo echo "DISPLAY_LEVEL 1" |sudo tee /dev/rshim0/misc
+sudo echo "DISPLAY_LEVEL 1" | sudo tee /dev/rshim0/misc
 
-sudo echo -e "\nUpdate netplan to assign IP to tmfif_net0..." |sudo tee -a /opt/install_log
+sudo echo -e "\nUpdate netplan to assign IP to tmfif_net0..." | sudo tee -a /opt/install_log
 sudo cp /local/repository/source/01-netcfg.yaml /etc/netplan/
 sudo systemctl restart systemd-networkd
 sudo netplan apply
 
 sudo ifconfig tmfifo_net0 |sudo tee -a /opt/install_log
 
-sudo echo -e "\nEnable IP forwarding and NAT for the SmartNIC" |sudo tee -a /opt/install_log
+sudo echo -e "\nEnable IP forwarding and NAT for the SmartNIC" | sudo tee -a /opt/install_log
 sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
 sudo iptables -A FORWARD -o eno1 -j ACCEPT
@@ -136,7 +141,7 @@ sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP
 # sudo ldconfig
 
 sudo echo -e "\nEnabling hugepages..." | sudo tee -a /opt/install_log
-sudo echo 1024 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+sudo echo 4096 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
