@@ -24,7 +24,7 @@ sudo chmod -R 777 /mydata
 
 sudo echo -e "\nInstalling DOCKER and its dependencies..." | sudo tee -a /opt/install_log
 #install dependencies for docker
-DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release"
+DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release locate"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER_DEP
 #install certificate for docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -55,7 +55,7 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
 
 sudo echo -e "\nInstalling Bluefield2 drivers and tools..." | sudo tee -a /opt/install_log
 sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
-sudo dpkg -i doca-host-repo-ubuntu2004_2.0.2–0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+DEBIAN_FRONTEND=noninteractive sudo dpkg -i /doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools
 
@@ -158,6 +158,8 @@ mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 # # wget https://developer.nvidia.com/networking/secure/doca-sdk/DOCA_1.0/DOCA_10_b163/ubuntu2004/doca-dpi-tools_21.03.038-1_amd64.deb
 
 
+sudo echo -e "\nUpdatedb..." | sudo tee -a /opt/install_log
+sudo updatedb
 
 sudo echo -e "\n\n ============ DONE =========== " |sudo tee -a /opt/install_log
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee -a /etc/motd
