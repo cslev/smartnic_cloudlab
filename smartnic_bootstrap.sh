@@ -1,30 +1,53 @@
 #!/bin/bash
 
+LOGFILE="/opt/install_log"
+
+function log () 
+{
+  msg=$1
+  d=$(date +"[%H:%m:%S] --")
+
+  if [ -f "$LOGFILE" ]
+  then
+    sudo echo -e "\n${d} ${msg}" | sudo tee -a $LOGFILE
+  else
+    sudo echo -e "\n${d} ${msg}" | sudo tee $LOGFILE
+  fi
+}
+
+
+
 sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
 
 cat /local/repository/source/bashrc_template | sudo tee /root/.bashrc
 
-sudo echo -e "\nUpdate package repository" | sudo tee /opt/install_log
+log "Update package repository" 
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 
+# add here any tool you want to be installed
+log "Install basic tools" 
+BASIC_DEP="locate pv"
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $BASIC_DEP
+
+
 ## don't need these things for now
-# sudo echo -e "\nInstalling xfce and vnc server..." | sudo tee -a /opt/install_log
+# log "Installing xfce and vnc server..." 
 # DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev firefox "
 # DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DEPS
 
 
-sudo echo -e "\nInstalling DOCA SDKMANAGER dependencies..." | sudo tee -a /opt/install_log
+log "Installing DOCA SDKMANAGER dependencies..."
 DOCA_SDK_MAN_DEP="gconf-service gconf-service-backend gconf2-common libcanberra-gtk-module libcanberra-gtk0 libgconf-2-4"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCA_SDK_MAN_DEP
 
 #setting up extra storage
-sudo echo -e "\nSet permissions for /mydata" | sudo tee -a /opt/install_log
+log "Set permissions for /mydata" 
 sudo chmod -R 777 /mydata
 
-sudo echo -e "\nInstalling DOCKER and its dependencies..." | sudo tee -a /opt/install_log
+log "Installing DOCKER and its dependencies..."
 #install dependencies for docker
-DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release locate"
+DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER_DEP
 #install certificate for docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
@@ -38,7 +61,7 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP
 
-sudo echo -e "\nStopping docker daemon and update location for downloading sources..."  | sudo tee -a /opt/install_log
+log "Stopping docker daemon and update location for downloading sources..."
 sudo /etc/init.d/docker stop
 #define new location in docker daemon.json
 sudo echo -e "{\n\t\"data-root\":\"/mydata/docker\"\n}" | sudo tee /etc/docker/daemon.json
@@ -48,12 +71,12 @@ rsync -aP /var/lib/docker/ /mydata/docker
 /etc/init.d/docker restart
 
 
-sudo  echo -e "\nUpdating system components..." | sudo tee -a /opt/install_log
+log "Updating system components..."
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
 
 
-sudo echo -e "\nInstalling Bluefield2 drivers and tools..." | sudo tee -a /opt/install_log
+log "Installing Bluefield2 drivers and tools..." 
 sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo dpkg -i /doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
@@ -63,17 +86,16 @@ DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-
 #########################
 ##### OLD STUFF HERE ####
 #########################
-# #sudo echo -e "\nCopy to /opt..." >> /opt/install_log
 # cd /opt
-# sudo echo -e "\nDownloading driver to /opt..." |sudo tee -a /opt/install_log
+# log "Downloading driver to /opt..." 
 # sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz 
 # #sudo cp /local/repository/source/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz /opt
 # #sudo cd /opt
-# sudo echo -e "\nUncompress..." |sudo tee -a /opt/install_log
+# log "Uncompress..."
 # sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz | sudo tee -a /opt/install_log
 
 # cd /opt/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64/
-# sudo echo -e "\nInstall driver..." |sudo tee -a /opt/install_log
+# log "Install driver..." 
 # sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 
 # cd ..
@@ -81,10 +103,10 @@ DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-
 #########################
 #########################
 
-sudo echo -e "\nEnable openibd" | sudo tee -a /opt/install_log
+log "Enable openibd" 
 sudo /etc/init.d/openibd restart | sudo tee -a /opt/install_log
 
-sudo echo -e "\nEnable rshim" | sudo tee -a /opt/install_log
+log "Enable rshim" 
 sudo systemctl enable rshim
 sudo systemctl start rshim
 sudo systemctl status rshim | sudo tee -a /opt/install_log
@@ -92,23 +114,26 @@ sudo systemctl status rshim | sudo tee -a /opt/install_log
 
 sudo echo "DISPLAY_LEVEL 1" | sudo tee /dev/rshim0/misc
 
-sudo echo -e "\nUpdate netplan to assign IP to tmfif_net0..." | sudo tee -a /opt/install_log
+log "Update netplan to assign IP to tmfif_net0..."
 sudo cp /local/repository/source/01-netcfg.yaml /etc/netplan/
 sudo systemctl restart systemd-networkd
 sudo netplan apply
 
 sudo ifconfig tmfifo_net0 |sudo tee -a /opt/install_log
 
-sudo echo -e "\nEnable IP forwarding and NAT for the SmartNIC" | sudo tee -a /opt/install_log
+log "Enable IP forwarding and NAT for the SmartNIC" 
 sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 sudo iptables -t nat -A POSTROUTING -o eno1 -j MASQUERADE
 sudo iptables -A FORWARD -o eno1 -j ACCEPT
 sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
 
 
-sudo echo -e "\nDownloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield" | sudo tee -a /opt/install_log
+log "Downloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield" 
 cd /opt/
 sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield" 
+sudo bfb-install --rshim /dev/rshim0 --bfb DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+
 
 
 # sudo mst start
@@ -140,8 +165,8 @@ sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP
 # sudo make | sudo tee -a /opt/install_log
 # sudo ldconfig
 
-sudo echo -e "\nEnabling hugepages..." | sudo tee -a /opt/install_log
-sudo echo 4096 |sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+log "Enabling hugepages..." 
+sudo echo 12280 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
@@ -158,10 +183,10 @@ mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
 # # wget https://developer.nvidia.com/networking/secure/doca-sdk/DOCA_1.0/DOCA_10_b163/ubuntu2004/doca-dpi-tools_21.03.038-1_amd64.deb
 
 
-sudo echo -e "\nUpdatedb..." | sudo tee -a /opt/install_log
+log "Updatedb..." 
 sudo updatedb
 
-sudo echo -e "\n\n ============ DONE =========== " |sudo tee -a /opt/install_log
+log "\n\n ============ DONE =========== "
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee -a /etc/motd
 sudo date | sudo tee -a /etc/motd
 
