@@ -77,8 +77,8 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
 
 
 log "Installing Bluefield2 drivers and tools..." 
-sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
-DEBIAN_FRONTEND=noninteractive sudo dpkg -i /doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb -O /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools
 
