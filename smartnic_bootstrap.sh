@@ -130,9 +130,9 @@ sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
 
 log "Downloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield" 
 cd /opt/
-sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
 log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield" 
-sudo bfb-install --rshim /dev/rshim0 --bfb DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
 
 
 
