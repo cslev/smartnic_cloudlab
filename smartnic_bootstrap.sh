@@ -145,29 +145,30 @@ sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.0
 # echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_CPU_MODEL=1"
 
 
-# sudo echo -e "\nInstalling DPDK..." | sudo tee -a /opt/install_log
-# cd /opt
-# sudo wget https://fast.dpdk.org/rel/dpdk-20.11.1.tar.xz 
-# sudo tar -xJvf dpdk-20.11.1.tar.xz |sudo tee -a /opt/install_log
-# cd dpdk-stable-20.11.1
-# export RTE_SDK=/opt/dpdk-stable-20.11.1
-# export RTE_TARGET=x86_64-native-linuxapp-gcc
+log "\nInstalling DPDK..." 
+cd /opt
+sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
+sudo tar -xJf dpdk-20.11.9.tar.xz |sudo tee -a /opt/install_log
+cd dpdk-stable-20.11.9
+export RTE_SDK=/opt/dpdk-stable-20.11.9
+export RTE_TARGET=x86_64-native-linuxapp-gcc
 # #export RTE_TARGET=arm64-armv8-linuxapp-gcc <-- this would be for the Bluefield, but now we are on the host
-# sudo meson -Dexamples=all build |sudo tee -a /opt/install_log
-# sudo ninja -C build | sudo tee -a /opt/install_log
-# sudo ninja -C build install | sudo tee -a /opt/install_log
+sudo meson -Dexamples=all build |sudo tee -a /opt/install_log
+sudo ninja -C build | sudo tee -a /opt/install_log
+sudo ninja -C build install | sudo tee -a /opt/install_log
 
-# sudo echo -e "\nInstalling pktgen..." | sudo tee -a /opt/install_log
-# cd /opt
-# sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.02.0.tar.xz 
-# sudo tar -xJvf pktgen-dpdk-pktgen-21.02.0.tar.xz | sudo tee -a /opt/install_log
-# cd pktgen-dpdk-pktgen-21.02.0/
-# sudo make | sudo tee -a /opt/install_log
-# sudo ldconfig
+log "\nInstalling pktgen..." 
+cd /opt
+sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.03.1.tar.xz
+sudo tar -xJvf pktgen-dpdk-pktgen-21.03.1.tar.xz | sudo tee -a /opt/install_log
+cd pktgen-dpdk-pktgen-21.03.1/
+sudo make | sudo tee -a /opt/install_log
+sudo ldconfig
 
 log "Enabling hugepages..." 
-sudo echo 12280 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+sudo echo 16384 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
 mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
+echo "vm.nr_hugepages = 16384" >> /etc/sysctl.conf
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
 # # cd ..
@@ -187,6 +188,6 @@ log "Updatedb..."
 sudo updatedb
 
 log "\n\n ============ DONE =========== "
-sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee -a /etc/motd
+sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
 
