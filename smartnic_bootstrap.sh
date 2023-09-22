@@ -19,6 +19,7 @@ function log ()
 
 sudo echo -e "\n\n ============ INSTALLATION IS IN PROGRESS =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
+sudo echo -e "\nTo keep track of the process:  tail -f /opt/install.log"
 
 cat /local/repository/source/bashrc_template | sudo tee /root/.bashrc
 
@@ -190,4 +191,6 @@ sudo updatedb
 log "\n\n ============ DONE =========== "
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
+sudo echo -e "\nTo see install log:  less /opt/install.log"
+
 
