@@ -31,3 +31,5 @@ PS1='\[\033[1m\]\[${hcolor}\][SmartNIC_HOST_${HOSTNAME}]\[\033[0;1m\]\[\033[38;5
 esac
 
 export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+export RTE_SDK=/opt/dpdk
+export RTE_TARGET=x86_64-native-linuxapp-gcc

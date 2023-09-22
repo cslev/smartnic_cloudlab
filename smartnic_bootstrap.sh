@@ -151,8 +151,7 @@ cd /opt
 sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
 sudo tar -xJf dpdk-20.11.9.tar.xz |sudo tee -a /opt/install_log
 cd dpdk-stable-20.11.9
-export RTE_SDK=/opt/dpdk-stable-20.11.9
-export RTE_TARGET=x86_64-native-linuxapp-gcc
+sudo ln -s /opt/dpdk-stable-20.11.9/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
 # #export RTE_TARGET=arm64-armv8-linuxapp-gcc <-- this would be for the Bluefield, but now we are on the host
 sudo meson -Dexamples=all build |sudo tee -a /opt/install_log
 sudo ninja -C build | sudo tee -a /opt/install_log
