@@ -133,7 +133,7 @@ log "Downloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield"
 cd /opt/
 sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
 log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield" 
-sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb |sudo tee -a /opt/install_log
 
 
 
@@ -168,7 +168,9 @@ sudo ldconfig
 
 log "Enabling hugepages..." 
 sudo echo 16384 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-mountpoint -q /dev/hugepages || mount -t hugetlbfs nodev /dev/hugepages
+sudo umount /dev/hugepages
+sudo mkdir -p /mnt/huge
+sudo mount -t hugetlbfs nodev /mnt/huge
 echo "vm.nr_hugepages = 16384" >> /etc/sysctl.conf
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
