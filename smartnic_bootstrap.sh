@@ -59,7 +59,7 @@ DOCKER="docker-ce docker-ce-cli containerd.io"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER | sudo tee -a /opt/install_log
 
 #dpdk and pktgen dependencies
-DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only"
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only python3-sphinxcontrib.apidoc"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
 
 log "Stopping docker daemon and update location for downloading sources..."
