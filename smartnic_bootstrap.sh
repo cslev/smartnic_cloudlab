@@ -24,12 +24,12 @@ sudo echo -e "\nTo keep track of the process:  tail -f /opt/install.log"
 cat /local/repository/source/bashrc_template | sudo tee /root/.bashrc
 
 log "Update package repository" 
-DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -y | sudo tee -a /opt/install_log
 
 # add here any tool you want to be installed
 log "Install basic tools" 
 BASIC_DEP="locate pv mc"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $BASIC_DEP
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $BASIC_DEP | sudo tee -a /opt/install_log
 
 
 ## don't need these things for now
@@ -40,7 +40,7 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 
 log "Installing DOCA SDKMANAGER dependencies..."
 DOCA_SDK_MAN_DEP="gconf-service gconf-service-backend gconf2-common libcanberra-gtk-module libcanberra-gtk0 libgconf-2-4"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCA_SDK_MAN_DEP
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCA_SDK_MAN_DEP | sudo tee -a /opt/install_log
 
 #setting up extra storage
 log "Set permissions for /mydata" 
@@ -49,18 +49,18 @@ sudo chmod -R 777 /mydata
 log "Installing DOCKER and its dependencies..."
 #install dependencies for docker
 DOCKER_DEP="apt-transport-https ca-certificates curl gnupg lsb-release"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER_DEP
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER_DEP | sudo tee -a /opt/install_log
 #install certificate for docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update -y
 #install docker
 DOCKER="docker-ce docker-ce-cli containerd.io"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER | sudo tee -a /opt/install_log
 
 #dpdk and pktgen dependencies
 DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
 
 log "Stopping docker daemon and update location for downloading sources..."
 sudo /etc/init.d/docker stop
@@ -73,15 +73,15 @@ rsync -aP /var/lib/docker/ /mydata/docker
 
 
 log "Updating system components..."
-DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
-DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y
+DEBIAN_FRONTEND=noninteractive sudo apt-get update -y | sudo tee -a /opt/install_log
+DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y | sudo tee -a /opt/install_log 
 
 
 log "Installing Bluefield2 drivers and tools..." 
 sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb -O /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
-DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools
+DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools | sudo tee -a /opt/install_log
 
 
 #########################
@@ -133,7 +133,7 @@ log "Downloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield"
 cd /opt/
 sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
 log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield" 
-sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb |sudo tee -a /opt/install_log
+sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb | sudo tee -a /opt/install_log
 
 
 
@@ -149,17 +149,17 @@ sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.0
 log "\nInstalling DPDK..." 
 cd /opt
 sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
-sudo tar -xJf dpdk-20.11.9.tar.xz |sudo tee -a /opt/install_log
+sudo tar -xJf dpdk-20.11.9.tar.xz | sudo tee -a /opt/install_log
 cd dpdk-stable-20.11.9
 sudo ln -s /opt/dpdk-stable-20.11.9/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
-sudo meson -Dexamples=all build |sudo tee -a /opt/install_log
+sudo meson -Dexamples=all build | sudo tee -a /opt/install_log
 sudo ninja -C build | sudo tee -a /opt/install_log
 sudo ninja -C build install | sudo tee -a /opt/install_log
 
 log "\nInstalling pktgen..." 
 cd /opt
 sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.03.1.tar.xz
-sudo tar -xJvf pktgen-dpdk-pktgen-21.03.1.tar.xz | sudo tee -a /opt/install_log
+sudo tar -xJf pktgen-dpdk-pktgen-21.03.1.tar.xz | sudo tee -a /opt/install_log
 cd pktgen-dpdk-pktgen-21.03.1/
 sudo make | sudo tee -a /opt/install_log
 sudo ldconfig
