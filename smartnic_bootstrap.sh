@@ -58,10 +58,6 @@ sudo apt-get update -y
 DOCKER="docker-ce docker-ce-cli containerd.io"
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DOCKER | sudo tee -a /opt/install_log
 
-#dpdk and pktgen dependencies
-DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only python3-sphinxcontrib.apidoc"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
-
 log "Stopping docker daemon and update location for downloading sources..."
 sudo /etc/init.d/docker stop
 #define new location in docker daemon.json
@@ -82,6 +78,10 @@ sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubu
 DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools | sudo tee -a /opt/install_log
+
+log "Installing DPDK and pktgen dependencies..." 
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only python3-sphinxcontrib.apidoc"
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
 
 
 #########################
