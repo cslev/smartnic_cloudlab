@@ -37,6 +37,9 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 # DEPS="tightvncserver lightdm lxde xfonts-base libnss3-dev firefox "
 # DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DEPS
 
+log "Installing apt-file..."
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends apt-file | sudo tee -a /opt/install_log
+DEBIAN_FRONTEND=noninteractive sudo apt-file update | sudo tee -a /opt/install_log
 
 log "Installing DOCA SDKMANAGER dependencies..."
 DOCA_SDK_MAN_DEP="gconf-service gconf-service-backend gconf2-common libcanberra-gtk-module libcanberra-gtk0 libgconf-2-4"
@@ -78,11 +81,6 @@ sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubu
 DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools | sudo tee -a /opt/install_log
-
-log "Installing DPDK and pktgen dependencies..." 
-DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only python3-sphinxcontrib.apidoc"
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
-
 
 #########################
 ##### OLD STUFF HERE ####
@@ -146,30 +144,52 @@ sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.0
 # echo -e "\n\nTo change mode: mlxconfig -d /dev/mst/mt41686_pciconf0 s INTERNAL_CPU_MODEL=1"
 
 
+
+log "Installing DPDK and pktgen dependencies..." 
+DPDK_DEP="libc6-dev libpcap0.8 libpcap0.8-dev libpcap-dev meson ninja-build libnuma-dev liblua5.3-dev lua5.3 luarocks python3-pyelftools build-essential librte-pmd-mlx5-20.0 ibverbs-providers libibverbs-dev mlnx-ofed-kernel-only"
+DPDK_DEP="${DPDK_DEP} python3-sphinxcontrib.apidoc doxygen libarchive-dev libjansson-dev libbsd-dev libelf-dev mstflint libbpf-dev cmake"
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
+
+
+
 log "\nInstalling DPDK..." 
 cd /opt
-sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
-sudo tar -xJf dpdk-20.11.9.tar.xz | sudo tee -a /opt/install_log
-cd dpdk-stable-20.11.9
-sudo ln -s /opt/dpdk-stable-20.11.9/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
+#sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
+sudo wget https://fast.dpdk.org/rel/dpdk-21.11.5.tar.xz
+#sudo tar -xJf dpdk-20.11.9.tar.xz | sudo tee -a /opt/install_log
+sudo tar -xJf dpdk-21.11.5.tar.xz | sudo tee -a /opt/install_log
+# sudo ln -s /opt/dpdk-stable-20.11.9/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc 
+sudo ln -s /opt/dpdk-stable-21.11.5/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
+cd dpdk
 sudo meson -Dexamples=all build | sudo tee -a /opt/install_log
 sudo ninja -C build | sudo tee -a /opt/install_log
 sudo ninja -C build install | sudo tee -a /opt/install_log
+sudo ldconfig
+
+log "\nInstalling CJSON lua library..."
+cd /opt
+sudo wget https://www.kyne.com.au/%7Emark/software/download/lua-cjson-2.1.0.tar.gz
+sudo tar -xzf lua-cjson-2.1.0.tar.gz | sudo tee -a /opt/install_log
+cd lua-cjson-2.1.0
+sudo luarocks make | sude tee -a /opt/install_log
+sudo ldconfig
+
 
 log "\nInstalling pktgen..." 
 cd /opt
-sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.03.1.tar.xz
-sudo tar -xJf pktgen-dpdk-pktgen-21.03.1.tar.xz | sudo tee -a /opt/install_log
-cd pktgen-dpdk-pktgen-21.03.1/
+# sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.03.1.tar.xz
+sudo wget https://github.com/pktgen/Pktgen-DPDK/archive/refs/tags/pktgen-21.11.0.tar.gz
+sudo tar -xzf pktgen-21.11.0.tar.gz | sudo tee -a /opt/install_log
+cd Pktgen-DPDK-pktgen-21.11.0
 sudo make | sudo tee -a /opt/install_log
 sudo ldconfig
 
 log "Enabling hugepages..." 
 sudo echo 16384 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
-sudo umount /dev/hugepages
+sudo umount -q /dev/hugepages
 sudo mkdir -p /mnt/huge
 sudo mount -t hugetlbfs nodev /mnt/huge
-echo "vm.nr_hugepages = 16384" >> /etc/sysctl.conf
+sudo echo "vm.nr_hugepages = 16384" | sudo tee -a /etc/sysctl.conf
 
 # # FORBIDDEN - HAVE TO BE LOGGED IN :(
 # # cd ..
