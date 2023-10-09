@@ -155,11 +155,11 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 log "\nInstalling DPDK..." 
 cd /opt
 #sudo wget https://fast.dpdk.org/rel/dpdk-20.11.9.tar.xz 
-sudo wget https://fast.dpdk.org/rel/dpdk-21.11.5.tar.xz
+sudo wget https://fast.dpdk.org/rel/dpdk-23.07.tar.xz
 #sudo tar -xJf dpdk-20.11.9.tar.xz | sudo tee -a /opt/install_log
-sudo tar -xJf dpdk-21.11.5.tar.xz | sudo tee -a /opt/install_log
+sudo tar -xJf dpdk-23.07.tar.xz | sudo tee -a /opt/install_log
 # sudo ln -s /opt/dpdk-stable-20.11.9/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc 
-sudo ln -s /opt/dpdk-stable-21.11.5/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
+sudo ln -s /opt/dpdk-23.07/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
 cd dpdk
 sudo meson -Dexamples=all build | sudo tee -a /opt/install_log
 sudo ninja -C build | sudo tee -a /opt/install_log
@@ -178,9 +178,9 @@ sudo ldconfig
 log "\nInstalling pktgen..." 
 cd /opt
 # sudo wget https://git.dpdk.org/apps/pktgen-dpdk/snapshot/pktgen-dpdk-pktgen-21.03.1.tar.xz
-sudo wget https://github.com/pktgen/Pktgen-DPDK/archive/refs/tags/pktgen-21.11.0.tar.gz
-sudo tar -xzf pktgen-21.11.0.tar.gz | sudo tee -a /opt/install_log
-cd Pktgen-DPDK-pktgen-21.11.0
+sudo wget https://github.com/pktgen/Pktgen-DPDK/archive/refs/tags/pktgen-23.06.1.tar.gz
+sudo tar -xzf pktgen-23.06.1.tar.gz | sudo tee -a /opt/install_log
+cd Pktgen-DPDK-pktgen-23.06.1
 sudo make | sudo tee -a /opt/install_log
 sudo ldconfig
 
