@@ -134,6 +134,10 @@ log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield"
 sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb | sudo tee -a /opt/install_log
 
 
+# log "Removing doca-runtime and its dependencies as it will collide with the latest DPDK and Pktgen..."
+# DEBIAN_FRONTEND=noninteractive sudo apt-get remove doca-runtime -y 
+# DEBIAN_FRONTEND=noninteractive sudo apt-get auto-remove -y 
+
 
 # sudo mst start
 # for i in $(sudo mst status -v|grep BlueField|awk '{print $2}')
@@ -151,6 +155,10 @@ DPDK_DEP="${DPDK_DEP} python3-sphinxcontrib.apidoc doxygen libarchive-dev libjan
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $DPDK_DEP | sudo tee -a /opt/install_log
 
 
+
+log "Removing mlnx-dpdk as it will collide with the latest DPDK and Pktgen..."
+DEBIAN_FRONTEND=noninteractive sudo apt-get remove mlnx-dpdk -y 
+sudo ldconfig
 
 log "\nInstalling DPDK..." 
 cd /opt
@@ -181,7 +189,7 @@ cd /opt
 sudo wget https://github.com/pktgen/Pktgen-DPDK/archive/refs/tags/pktgen-23.06.1.tar.gz
 sudo tar -xzf pktgen-23.06.1.tar.gz | sudo tee -a /opt/install_log
 cd Pktgen-DPDK-pktgen-23.06.1
-sudo make | sudo tee -a /opt/install_log
+sudo make buildlua | sudo tee -a /opt/install_log
 sudo ldconfig
 
 log "Enabling hugepages..." 
