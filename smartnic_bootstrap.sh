@@ -211,6 +211,10 @@ sudo updatedb
 log "\n\n ============ DONE =========== "
 sudo echo -e "\n\n ============ INSTALLATION FINISHED =========== " |sudo tee /etc/motd
 sudo date | sudo tee -a /etc/motd
+sudo echo -e "############## WARNING DPDK And PKTGEN USERS ##############" |sudo tee -a /etc/motd
+sudo echo -e "you may delete 'mlnx-dpdk' package if the newest pktgen complains as:" |sudo tee -a /etc/motd
+sudo echo -e "Symbol \`rte_eth_fp_ops' has different size in shared object, consider re-linking" |sudo tee -a /etc/motd
+sudo echo -e "###########################################################" |sudo tee -a /etc/motd
 sudo echo -e "\nTo see install log:  less /opt/install.log"
 
 
