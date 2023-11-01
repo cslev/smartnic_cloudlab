@@ -77,23 +77,40 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get upgrade -y | sudo tee -a /opt/instal
 
 
 log "Installing Bluefield2 drivers and tools..." 
+## DOCA v2.0.2 for ubuntu 2024
 sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.0.2/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb -O /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
 DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2004_2.0.2-0.0.7.2.0.2027.1.23.04.0.5.3.0_amd64.deb
+## DOCA v2.2.1 for ubuntu 2204
+#sudo wget https://www.mellanox.com/downloads/DOCA/DOCA_v2.2.1/doca-host-repo-ubuntu2204_2.2.1-0.0.3.2.2.1009.1.23.07.0.5.0.0_amd64.deb -O /opt/doca-host-repo-ubuntu2204_2.2.1-0.0.3.2.2.1009.1.23.07.0.5.0.0_amd64.deb
+#DEBIAN_FRONTEND=noninteractive sudo dpkg -i /opt/doca-host-repo-ubuntu2204_2.2.1-0.0.3.2.2.1009.1.23.07.0.5.0.0_amd64.deb
+
+
+
 DEBIAN_FRONTEND=noninteractive sudo apt-get update -y
 DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends doca-runtime doca-tools | sudo tee -a /opt/install_log
 
-#########################
-##### OLD STUFF HERE ####
-#########################
-# cd /opt
-# log "Downloading driver to /opt..." 
-# sudo wget  http://www.mellanox.com/downloads/ofed/MLNX_OFED-5.3-1.0.0.1/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz 
-# #sudo cp /local/repository/source/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz /opt
-# #sudo cd /opt
-# log "Uncompress..."
-# sudo tar -xzvf MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64.tgz | sudo tee -a /opt/install_log
 
-# cd /opt/MLNX_OFED_LINUX-5.3-1.0.0.1-ubuntu20.04-x86_64/
+
+
+############################$$$$$$$###################################
+##### MANUAL INSTALL, e.g., FOR UNSUPPORTED DISTRIBUTION VERSIONS ####
+###################################$$$$$$$############################
+# log "Downloading driver to /opt..." 
+# cd /opt
+#### UBUNTU 22.04
+# sudo wget https://content.mellanox.com/ofed/MLNX_OFED-23.07-0.5.1.2/MLNX_OFED_LINUX-23.07-0.5.1.2-ubuntu22.04-x86_64.tgz
+
+#### UBUNTU 23.04
+# sudo wget https://content.mellanox.com/ofed/MLNX_OFED-23.07-0.5.1.2/MLNX_OFED_LINUX-23.07-0.5.1.2-ubuntu23.04-x86_64.tgz
+
+#### DEBIAN 11.3
+# sudo wget https://content.mellanox.com/ofed/MLNX_OFED-23.07-0.5.1.2/MLNX_OFED_LINUX-23.07-0.5.1.2-debian11.3-x86_64.tgz
+
+
+# log "Uncompress..."
+# sudo tar -xzvf MLNX_OFED_LINUX-23.07-0.5.1.2-ubuntu22.04-x86_64.tgz | sudo tee -a /opt/install_log
+
+# cd MLNX_OFED_LINUX-23.07-0.5.1.2-ubuntu22.04-x86_64
 # log "Install driver..." 
 # sudo ./mlnxofedinstall --auto-add-kernel-support --without-fw-update --force |sudo tee -a /opt/install_log
 
@@ -111,7 +128,7 @@ sudo systemctl start rshim
 sudo systemctl status rshim | sudo tee -a /opt/install_log
 
 
-sudo echo "DISPLAY_LEVEL 1" | sudo tee /dev/rshim0/misc
+sudo echo "DISPLAY_LEVEL 2" | sudo tee /dev/rshim0/misc
 
 log "Update netplan to assign IP to tmfif_net0..."
 sudo cp /local/repository/source/01-netcfg.yaml /etc/netplan/
@@ -127,11 +144,15 @@ sudo iptables -A FORWARD -o eno1 -j ACCEPT
 sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
 
 
-log "Downloading the latest BlueOS firmware (22.04-10.23-04) for the Bluefield" 
+log "Downloading the latest BlueOS firmware for the Bluefield" 
 cd /opt/
-sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
-log "Writing the latest BlueOS firmware (22.04-10.23-04) into the Bluefield" 
-sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb | sudo tee -a /opt/install_log
+## DOCA 2.0.2
+# sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
+# sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu20.04/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb -O /opt/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb
+## DOCA 2.2.0
+sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.2.0_BSP_4.2.0_Ubuntu_22.04-2.23-07.prod.bfb -O /opt/DOCA_2.2.0_BSP_4.2.0_Ubuntu_22.04-2.23-07.prod.bfb
+log "Writing the latest BlueOS firmware into the Bluefield" 
+sudo bfb-install --rshim /dev/rshim0 --bfb /opt/DOCA_2.2.0_BSP_4.2.0_Ubuntu_22.04-2.23-07.prod.bfb | sudo tee -a /opt/install_log
 
 
 # log "Removing doca-runtime and its dependencies as it will collide with the latest DPDK and Pktgen..."
