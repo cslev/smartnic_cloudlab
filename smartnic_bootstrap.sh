@@ -146,9 +146,13 @@ sudo iptables -A FORWARD -m state --state ESTABLISHED,RELATED -i eno1 -j ACCEPT
 
 log "Downloading the latest BlueOS firmware for the Bluefield" 
 cd /opt/
+
+## DOCA 1.0
+# sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu20.04/DOCA_v1.0_BlueField_OS_Ubuntu_20.04-5.3-1.0.0.0-3.6.0.11699-1-aarch64.bfb -O /opt/DOCA_v1.0_BlueField_OS_Ubuntu_20.04-5.3-1.0.0.0-3.6.0.11699-1-aarch64.bfb
+## DOCA 1.5.2
+# sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu20.04/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb -O /opt/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb
 ## DOCA 2.0.2
 # sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb -O /opt/DOCA_2.0.2_BSP_4.0.3_Ubuntu_22.04-10.23-04.prod.bfb
-# sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu20.04/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb -O /opt/DOCA_1.5.2_BSP_3.9.6_Ubuntu_20.04-5.2306-LTS.prod.bfb
 ## DOCA 2.2.0
 sudo wget https://content.mellanox.com/BlueField/BFBs/Ubuntu22.04/DOCA_2.2.0_BSP_4.2.0_Ubuntu_22.04-2.23-07.prod.bfb -O /opt/DOCA_2.2.0_BSP_4.2.0_Ubuntu_22.04-2.23-07.prod.bfb
 log "Writing the latest BlueOS firmware into the Bluefield" 
