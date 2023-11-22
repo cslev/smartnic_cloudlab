@@ -181,6 +181,7 @@ DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends $
 
 
 
+
 log "Removing mlnx-dpdk as it will collide with the latest DPDK and Pktgen..."
 DEBIAN_FRONTEND=noninteractive sudo apt-get remove mlnx-dpdk -y 
 sudo ldconfig
@@ -195,6 +196,17 @@ sudo tar -xJf dpdk-23.07.tar.xz | sudo tee -a /opt/install_log
 sudo ln -s /opt/dpdk-23.07/ /opt/dpdk ## /opt/dpdk is set as RTE_SDK in bashrc
 cd dpdk
 sudo meson -Dexamples=all build | sudo tee -a /opt/install_log
+#########################
+### DPDK + CUDA #########
+#########################
+# we have to install cuda toolkit from https://developer.nvidia.com/cuda-toolkit
+# and if installed but headers are not found by DPDK during meson build: 
+## - download the header files 
+# git clone https://gitlab.com/nvidia/headers/cuda-individual/cudart
+## - then when compiling DPDK with meson, set the path to be included
+# meson -Dexamples=all -Dc_args=-I/home/csikorl/cudart build
+
+
 sudo ninja -C build | sudo tee -a /opt/install_log
 sudo ninja -C build install | sudo tee -a /opt/install_log
 sudo ldconfig
